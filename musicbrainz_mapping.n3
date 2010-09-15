@@ -21,7 +21,7 @@ map:database a d2rq:Database;
 	d2rq:jdbcDriver "org.postgresql.Driver";
 	d2rq:jdbcDSN "jdbc:postgresql://localhost/musicbrainz_db";
 	d2rq:username "kurtjx";
-	d2rq:password "my1stPsql";
+	d2rq:password "kurtjx";
 	d2rq:resultSizeLimit 500;
 	.
 
@@ -67,6 +67,34 @@ map:artistAlias a d2rq:PropertyBridge;
   	d2rq:column "musicbrainz.artist_name.name";
   	.
 
+#######################
+# release_group table #
+#######################
+mapmb:ReleaseGroup a d2rq:ClassMap;
+    d2rq:dataStorage map:database;
+	d2rq:uriPattern "release-group/@@musicbrainz.release_group.gid@@#_";
+	d2rq:class mo:SignalGroup;
+	d2rq:classDefinitionLabel "Signal Group"@en;
+	.
+
+mapmb:ReleaseGroup a d2rq:PropertyBridge;
+    d2rq:belongsToClassMap mapmb:ReleaseGroup;
+	d2rq:property dct:title, rdfs:label;
+	d2rq:join "musicbrainz.release_group.name => musicbrainz.release_name.id";
+	d2rq:column "musicbrainz.release_name.name";
+	.
+	
+
+mapmb:releaseGroupMaker a d2rq:PropertyBridge;
+    d2rq:belongsToClassMap mapmb:ReleaseGroup;
+	d2rq:property foaf:maker;
+	d2rq:refersToClassMap mapmb:Artist;
+	d2rq:join "musicbrainz.release_group.artist_credit => musicbrainz.artist_credit.id";
+	d2rq:join "musicbrainz.artist_credit_name.artist_credit <= musicbrainz.artist_credit.id";
+	d2rq:join "musicbrainz.artist_credit_name.artist => musicbrainz.artist.id";
+	.
+
+
 #################
 # release table #
 #################
@@ -79,7 +107,7 @@ mapmb:Release a d2rq:ClassMap;
 
 mapmb:releaseName a d2rq:PropertyBridge;
     d2rq:belongsToClassMap mapmb:Release;
-	d2rq:property dct:title;
+	d2rq:property dct:title, rdfs:label;
 	d2rq:join "musicbrainz.release.name => musicbrainz.release_name.id";
 	d2rq:column "musicbrainz.release_name.name";
 	.
@@ -89,6 +117,38 @@ mapmb:releaseMaker a d2rq:PropertyBridge;
 	d2rq:property foaf:maker;
 	d2rq:refersToClassMap mapmb:Artist;
 	d2rq:join "musicbrainz.release.artist_credit => musicbrainz.artist_credit.id";
+	d2rq:join "musicbrainz.artist_credit_name.artist_credit <= musicbrainz.artist_credit.id";
+	d2rq:join "musicbrainz.artist_credit_name.artist => musicbrainz.artist.id";
+	.
+
+
+#########
+# Track #
+#########
+# TODO Track as blank nodes
+
+#############
+# Recording #
+#############
+mapmb:Recording a d2rq:ClassMap;
+    d2rq:dataStorage map:database;
+	d2rq:class mo:Signal;
+	d2rq:classDefinitionLabel "Signal"@en;
+	d2rq:uriPattern "recording/@@musicbrainz.recording.gid@@#_";
+	.
+
+mapmb:recordingName a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap mapmb:Recording;
+	d2rq:property dct:title, rdfs:label;
+	d2rq:join "musicbrainz.recording.name => musicbrainz.track_name.id";
+	d2rq:column "musicbrainz.track_name.name";
+	.
+
+mapmb:recordingMaker a d2rq:PropertyBridge;
+    d2rq:belongsToClassMap mapmb:Recording;
+	d2rq:property foaf:maker;
+	d2rq:refersToClassMap mapmb:Artist;
+	d2rq:join "musicbrainz.recording.artist_credit => musicbrainz.artist_credit.id";
 	d2rq:join "musicbrainz.artist_credit_name.artist_credit <= musicbrainz.artist_credit.id";
 	d2rq:join "musicbrainz.artist_credit_name.artist => musicbrainz.artist.id";
 	.
