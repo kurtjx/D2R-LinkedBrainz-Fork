@@ -1,0 +1,94 @@
+@prefix map: <file:/home/kurtjx/srcs/d2r-server-0.7/mapping.n3#> .
+@prefix mapmb: <file:/home/kurtjx/srcs/d2r-server-0.7/mapping.n3#musicbrainz.> .
+@prefix db: <http://musicbrainz.org/> .
+@prefix vocab: <http://localhost:2020/vocab/resource/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix d2rq: <http://www.wiwiss.fu-berlin.de/suhl/bizer/D2RQ/0.1#> .
+@prefix d2r: <http://sites.wiwiss.fu-berlin.de/suhl/bizer/d2r-server/config.rdf#> .
+@prefix jdbc: <http://d2rq.org/terms/jdbc/> .
+# vocabs in mapping
+@prefix mo: <http://purl.org/ontology/mo/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix ov: <http://open.vocab.org/terms/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+
+
+# connection stuff
+map:database a d2rq:Database;
+	d2rq:jdbcDriver "org.postgresql.Driver";
+	d2rq:jdbcDSN "jdbc:postgresql://localhost/musicbrainz_db";
+	d2rq:username "kurtjx";
+	d2rq:password "my1stPsql";
+	d2rq:resultSizeLimit 500;
+	.
+
+<> a d2r:Server;
+    rdfs:label "LinkedBrainz";
+    d2r:baseURI <http://musicbrainz.org/>;
+    d2r:port 2020;
+    d2r:documentMetadata [
+        rdfs:comment "This is an RDF translation of the MusicBrainz service.";
+    ];
+	d2r:vocabularyIncludeInstances true;    
+    .
+
+################
+# artist table #
+################
+mapmb:Artist a d2rq:ClassMap;
+	d2rq:dataStorage map:database;
+	d2rq:uriPattern "artist/@@musicbrainz.artist.gid@@#_";
+	d2rq:class mo:MusicArtist;
+	d2rq:classDefinitionLabel "Music Artist"@en;
+	.
+
+map:artistName a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap mapmb:Artist;
+	d2rq:property foaf:name;
+	d2rq:join "musicbrainz.artist.name => musicbrainz.artist_name.id";
+	d2rq:column "musicbrainz.artist_name.name";
+	.
+
+map:artistSortName a d2rq:PropertyBridge;
+    d2rq:belongsToClassMap mapmb:Artist;
+	d2rq:property ov:sortLabel;
+  	d2rq:join "musicbrainz.artist.sortname => musicbrainz.artist_name.id";
+  	d2rq:column "musicbrainz.artist_name.name";
+  	.
+
+map:artistAlias a d2rq:PropertyBridge;
+	d2rq:belongsToClassMap mapmb:Artist;
+	d2rq:property skos:altLabel;
+	d2rq:join "musicbrainz.artist_alias.name => musicbrainz.artist_name.id";
+	d2rq:join "musicbrainz.artist_alias.artist => musicbrainz.artist.id";
+  	d2rq:column "musicbrainz.artist_name.name";
+  	.
+
+#################
+# release table #
+#################
+mapmb:Release a d2rq:ClassMap;
+    d2rq:dataStorage map:database;
+	d2rq:class mo:Release;
+	d2rq:classDefinitionLabel "Release"@en;
+	d2rq:uriPattern "release/@@musicbrainz.release.gid@@#_";
+	.
+
+mapmb:releaseName a d2rq:PropertyBridge;
+    d2rq:belongsToClassMap mapmb:Release;
+	d2rq:property dct:title;
+	d2rq:join "musicbrainz.release.name => musicbrainz.release_name.id";
+	d2rq:column "musicbrainz.release_name.name";
+	.
+
+mapmb:releaseMaker a d2rq:PropertyBridge;
+    d2rq:belongsToClassMap mapmb:Release;
+	d2rq:property foaf:maker;
+	d2rq:refersToClassMap mapmb:Artist;
+	d2rq:join "musicbrainz.release.artist_credit => musicbrainz.artist_credit.id";
+	d2rq:join "musicbrainz.artist_credit_name.artist_credit <= musicbrainz.artist_credit.id";
+	d2rq:join "musicbrainz.artist_credit_name.artist => musicbrainz.artist.id";
+	.
