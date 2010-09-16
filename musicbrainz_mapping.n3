@@ -1,6 +1,6 @@
 @prefix map: <file:/home/kurtjx/srcs/d2r-server-0.7/mapping.n3#> .
 @prefix mapmb: <file:/home/kurtjx/srcs/d2r-server-0.7/mapping.n3#musicbrainz.> .
-@prefix db: <http://musicbrainz.org/> .
+@prefix mbz: <http://musicbrainz.org/> .
 @prefix vocab: <http://localhost:2020/vocab/resource/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -22,7 +22,7 @@ map:database a d2rq:Database;
 	d2rq:jdbcDSN "jdbc:postgresql://localhost/musicbrainz_db";
 	d2rq:username "kurtjx";
 	d2rq:password "kurtjx";
-	d2rq:resultSizeLimit 500;
+	d2rq:resultSizeLimit 50;
 	.
 
 <> a d2r:Server;
@@ -77,7 +77,7 @@ mapmb:ReleaseGroup a d2rq:ClassMap;
 	d2rq:classDefinitionLabel "Signal Group"@en;
 	.
 
-mapmb:ReleaseGroup a d2rq:PropertyBridge;
+mapmb:releaseGroupName a d2rq:PropertyBridge;
     d2rq:belongsToClassMap mapmb:ReleaseGroup;
 	d2rq:property dct:title, rdfs:label;
 	d2rq:join "musicbrainz.release_group.name => musicbrainz.release_name.id";
@@ -125,7 +125,28 @@ mapmb:releaseMaker a d2rq:PropertyBridge;
 #########
 # Track #
 #########
-# TODO Track as blank nodes
+#mapmb:Track a d2rq:ClassMap;
+#    d2rq:dataStorage map:database;
+#	d2rq:bNodeIdColumns "musicbrainz.track.id";
+#	d2rq:class mo:Track;
+#	d2rq:classDefinitionLabel "Track"@en;
+#	.
+
+#mapmb:trackName a d2rq:PropertyBridge;
+#	d2rq:belongsToClassMap mapmb:Track;
+#	d2rq:property dct:title, rdfs:label;
+#	d2rq:join "musicbrainz.track.name => musicbrainz.track_name.id";
+#	d2rq:column "musicbrainz.track_name.name";
+#	.
+
+#mapmb:trackMaker a d2rq:PropertyBridge;
+#    d2rq:belongsToClassMap mapmb:Track;
+#	d2rq:property foaf:maker;
+#	d2rq:refersToClassMap mapmb:Artist;
+#	d2rq:join "musicbrainz.track.artist_credit => musicbrainz.artist_credit.id";
+#	d2rq:join "musicbrainz.artist_credit_name.artist_credit <= musicbrainz.artist_credit.id";
+#	d2rq:join "musicbrainz.artist_credit_name.artist => musicbrainz.artist.id";
+#	.
 
 #############
 # Recording #
