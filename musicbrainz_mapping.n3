@@ -103,6 +103,62 @@ map:artistTypeGroup a d2rq:PropertyBridge;
     d2rq:constantValue mo:MusicGroup;
     .
 
+# TODO setups artist foaf:made
+map:artistCreditRelease a d2rq:PropertyBridge;
+    d2rq:belongsToClassMap map:Artist;
+    d2rq:property foaf:made;
+    d2rq:limit 100;
+    d2rq:limitInverse 100;
+    d2rq:join "musicbrainz.release.artist_credit => musicbrainz.artist_credit.id";
+    d2rq:join "musicbrainz.artist_credit_name.artist_credit => musicbrainz.artist_credit.id";
+    d2rq:join "musicbrainz.artist_credit_name.artist => musicbrainz.artist.id";
+    d2rq:refersToClassMap map:Release;
+    .
+
+map:artistCreditRecording a d2rq:PropertyBridge;
+    d2rq:belongsToClassMap map:Artist;
+    d2rq:property foaf:made;
+    d2rq:limit 100;
+    d2rq:limitInverse 100;
+    d2rq:join "musicbrainz.recording.artist_credit => musicbrainz.artist_credit.id";
+    d2rq:join "musicbrainz.artist_credit_name.artist_credit => musicbrainz.artist_credit.id";
+    d2rq:join "musicbrainz.artist_credit_name.artist => musicbrainz.artist.id";
+    d2rq:refersToClassMap map:Release;
+    .
+
+map:artistCreditWork a d2rq:PropertyBridge;
+    d2rq:belongsToClassMap map:Artist;
+    d2rq:property foaf:made;
+    d2rq:limit 100;
+    d2rq:limitInverse 100;
+    d2rq:refersToClassMap map:Work;
+    d2rq:join "musicbrainz.work.artist_credit => musicbrainz.artist_credit.id";
+    d2rq:join "musicbrainz.artist_credit_name.artist_credit => musicbrainz.artist_credit.id";
+    d2rq:join "musicbrainz.artist_credit_name.artist => musicbrainz.artist.id";
+    .
+
+map:artistCreditReleaseGroup a d2rq:PropertyBridge;
+    d2rq:belongsToClassMap map:Artist;
+    d2rq:property foaf:made;
+    d2rq:limit 100;
+    d2rq:limitInverse 100;
+    d2rq:refersToClassMap map:ReleaseGroup;
+    d2rq:join "musicbrainz.release_group.artist_credit => musicbrainz.artist_credit.id";
+    d2rq:join "musicbrainz.artist_credit_name.artist_credit => musicbrainz.artist_credit.id";
+    d2rq:join "musicbrainz.artist_credit_name.artist => musicbrainz.artist.id";
+    .
+
+map:artistCreditTrack a d2rq:PropertyBridge;
+    d2rq:belongsToClassMap map:Artist;
+    d2rq:property foaf:made;
+    d2rq:limit 100;
+    d2rq:limitInverse 100;
+    d2rq:refersToClassMap map:Track;
+    d2rq:join "musicbrainz.track.artist_credit => musicbrainz.artist_credit.id";
+    d2rq:join "musicbrainz.artist_credit_name.artist_credit => musicbrainz.artist_credit.id";
+    d2rq:join "musicbrainz.artist_credit_name.artist => musicbrainz.artist.id";
+    .
+
 # country
 map:artistCountry a d2rq:PropertyBridge;
     d2rq:belongsToClassMap map:Artist;
@@ -146,6 +202,7 @@ map:artistDBpedia a d2rq:PropertyBridge;
     .
     
 # discogs id=214
+# TODO discogs will pry need a translator as they do some funky things to the URIs
 
 # bbc link_type.id=205
 map:artistBBC a d2rq:PropertyBridge;
@@ -208,7 +265,7 @@ map:releaseGroupCredit a d2rq:PropertyBridge;
     d2rq:property foaf:maker;
     d2rq:refersToClassMap map:Artist;
     d2rq:join "musicbrainz.release_group.artist_credit => musicbrainz.artist_credit.id";
-    d2rq:join "musicbrainz.artist_credit_name.artist_credit <= musicbrainz.artist_credit.id";
+    d2rq:join "musicbrainz.artist_credit_name.artist_credit => musicbrainz.artist_credit.id";
     d2rq:join "musicbrainz.artist_credit_name.artist => musicbrainz.artist.id";
     .
 
@@ -230,22 +287,39 @@ map:releaseName a d2rq:PropertyBridge;
     d2rq:column "musicbrainz.release_name.name";
     .
 
-map:releaseCredit a d2rq:PropertyBridge;
+map:release_credit a d2rq:PropertyBridge;
     d2rq:belongsToClassMap map:Release;
     d2rq:property foaf:maker;
     d2rq:refersToClassMap map:Artist;
     d2rq:join "musicbrainz.release.artist_credit => musicbrainz.artist_credit.id";
-    d2rq:join "musicbrainz.artist_credit_name.artist_credit <= musicbrainz.artist_credit.id";
+    d2rq:join "musicbrainz.artist_credit_name.artist_credit => musicbrainz.artist_credit.id";
     d2rq:join "musicbrainz.artist_credit_name.artist => musicbrainz.artist.id";
     .
 
-map:releaseCountry a d2rq:PropertyBridge;
+map:release_country a d2rq:PropertyBridge;
     d2rq:belongsToClassMap map:Release;
     d2rq:property mo:publishing_location;
     d2rq:uriPattern "http://ontologi.es/place/@@musicbrainz.country.isocode@@";
     d2rq:join "musicbrainz.release.country => musicbrainz.country.id";
     .
 
+map:release_record_label a d2rq:PropertyBridge;
+    d2rq:belongsToClassMap map:Release;
+    d2rq:property mo:label;
+    d2rq:refersToClassMap map:Label;
+    d2rq:join "musicbrainz.release_label.release => musicbrainz.release.id";
+    d2rq:join "musicbrainz.release_label.label => musicbrainz.label.id";
+    .
+
+map:release_tracklists a d2rq:PropertyBridge;
+    d2rq:belongsToClassMap map:Release;
+    d2rq:property mo:record;
+    d2rq:join "musicbrainz.medium.release => musicbrainz.release.id";
+    d2rq:join "musicbrainz.medium.tracklist => musicbrainz.tracklist.id";
+    d2rq:refersToClassMap map:Tracklist;
+    .
+
+# Release Event
 map:ReleaseEvent a d2rq:ClassMap;
     d2rq:dataStorage map:database;
     d2rq:class mo:ReleaseEvent;
@@ -281,6 +355,22 @@ map:releaseEventDateFull a d2rq:PropertyBridge;
     d2rq:datatype xsd:date;
     .
     
+#############
+# Tracklist #
+#############
+map:Tracklist a d2rq:ClassMap;
+    d2rq:dataStorage map:database;
+    d2rq:class mo:Record;
+    d2rq:classDefinitionLabel "Record"@en;
+    d2rq:uriPattern "tracklist/@@musicbrainz.tracklist.id@@#_";
+    .
+
+map:tracklist_track a d2rq:PropertyBridge;
+    d2rq:belongsToClassMap map:Tracklist;
+    d2rq:property mo:track;
+    d2rq:refersToClassMap map:Track;
+    d2rq:join "musicbrainz.track.tracklist => musicbrainz.tracklist.id";
+    .
 
 #########
 # Track #
@@ -292,20 +382,27 @@ map:Track a d2rq:ClassMap;
     d2rq:classDefinitionLabel "Track"@en;
     .
 
-map:trackName a d2rq:PropertyBridge;
+map:track_name a d2rq:PropertyBridge;
     d2rq:belongsToClassMap map:Track;
     d2rq:property dct:title, rdfs:label;
     d2rq:join "musicbrainz.track.name => musicbrainz.track_name.id";
     d2rq:column "musicbrainz.track_name.name";
     .
 
-map:trackCredit a d2rq:PropertyBridge;
+map:track_credit a d2rq:PropertyBridge;
     d2rq:belongsToClassMap map:Track;
     d2rq:property foaf:maker;
     d2rq:refersToClassMap map:Artist;
     d2rq:join "musicbrainz.track.artist_credit => musicbrainz.artist_credit.id";
-    d2rq:join "musicbrainz.artist_credit_name.artist_credit <= musicbrainz.artist_credit.id";
+    d2rq:join "musicbrainz.artist_credit_name.artist_credit => musicbrainz.artist_credit.id";
     d2rq:join "musicbrainz.artist_credit_name.artist => musicbrainz.artist.id";
+    .
+
+map:track_to_recording a d2rq:PropertyBridge;
+    d2rq:belongsToClassMap map:Track;
+    d2rq:property mo:published_as;
+    d2rq:refersToClassMap map:Recording;
+    d2rq:join "musicbrainz.track.recording => musicbrainz.recording.id";
     .
 
 #############
@@ -318,19 +415,19 @@ map:Recording a d2rq:ClassMap;
     d2rq:uriPattern "recording/@@musicbrainz.recording.gid@@#_";
     .
 
-map:recordingName a d2rq:PropertyBridge;
+map:recording_name a d2rq:PropertyBridge;
     d2rq:belongsToClassMap map:Recording;
     d2rq:property dct:title, rdfs:label;
     d2rq:join "musicbrainz.recording.name => musicbrainz.track_name.id";
     d2rq:column "musicbrainz.track_name.name";
     .
 
-map:recordingCredit a d2rq:PropertyBridge;
+map:recording_credit a d2rq:PropertyBridge;
     d2rq:belongsToClassMap map:Recording;
     d2rq:property foaf:maker;
     d2rq:refersToClassMap map:Artist;
     d2rq:join "musicbrainz.recording.artist_credit => musicbrainz.artist_credit.id";
-    d2rq:join "musicbrainz.artist_credit_name.artist_credit <= musicbrainz.artist_credit.id";
+    d2rq:join "musicbrainz.artist_credit_name.artist_credit => musicbrainz.artist_credit.id";
     d2rq:join "musicbrainz.artist_credit_name.artist => musicbrainz.artist.id";
     .
 
@@ -388,7 +485,7 @@ map:workCredit a d2rq:PropertyBridge;
     d2rq:property foaf:maker;
     d2rq:refersToClassMap map:Artist;
     d2rq:join "musicbrainz.work.artist_credit => musicbrainz.artist_credit.id";
-    d2rq:join "musicbrainz.artist_credit_name.artist_credit <= musicbrainz.artist_credit.id";
+    d2rq:join "musicbrainz.artist_credit_name.artist_credit => musicbrainz.artist_credit.id";
     d2rq:join "musicbrainz.artist_credit_name.artist => musicbrainz.artist.id";
     .
 
