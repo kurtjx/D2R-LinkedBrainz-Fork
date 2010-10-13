@@ -24,8 +24,16 @@ public class DurationTranslator implements Translator {
 	}
 
 	public String toDBValue(String rdfValue) {
-	    //TODO parse xsd:duration FIXME
-	    return null;
+	    String [] MinuteSecond = rdfValue.replaceAll("PT", "").replaceAll("S", "").split("M");
+	    if(MinuteSecond.length==2){
+	    	float minutes = Float.parseFloat(MinuteSecond[0]);
+	    	float seconds = Float.parseFloat(MinuteSecond[1]);
+	    	return Integer.toString((int) (minutes*60.0*1000.0+seconds*1000.0));
+	    }
+	    else{
+	    	return null;
+	    }
+	    
 	}	
 
 	public String toRDFValue(String dbValue) {
